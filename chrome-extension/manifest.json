@@ -1,0 +1,34 @@
+{
+  "name": "NeuralMail AI - Smart Email Assistant",
+  "description": "AI email reply with intent detection, PDF, image and audio analysis. No login required.",
+  "version": "3.0.0",
+  "manifest_version": 3,
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "http://localhost:8080/*",
+    "http://localhost:8081/*",
+    "http://localhost:8082/*",
+    "https://neuralmail-ai.onrender.com/*",
+    "*://mail.google.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": ["*://mail.google.com/*"],
+    "js": ["content.js"],
+    "run_at": "document_end"
+  }],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "NeuralMail AI",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,14 @@
+target/
+**/target/
+*.log
+**/application-local.properties
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.pem
+.env
+.DS_Store
+Thumbs.db
+chrome-extension/.vscode/

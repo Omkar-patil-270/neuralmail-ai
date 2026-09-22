@@ -1,0 +1,13 @@
+target/
+*.log
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+**/application-local.properties
+.idea
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.pem
+.env

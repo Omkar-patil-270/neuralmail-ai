@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NeuralMail AI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+:root{--ink:#e8e4dc;--ink-dim:rgba(232,228,220,.45);--ink-ghost:rgba(232,228,220,.15);--bg:#080810;--surface:rgba(255,255,255,.032);--surface-hover:rgba(255,255,255,.06);--border:rgba(255,255,255,.07);--border-bright:rgba(255,255,255,.14);--accent:#c8b8ff;--green:#7effd4;--amber:#ffd97a;--red:#ff7a7a;--mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:310px;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;position:relative;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:100;opacity:.5;}
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);animation:drift 18s ease-in-out infinite;}
+.orb-1{width:180px;height:180px;top:-60px;left:-40px;background:radial-gradient(circle,rgba(200,184,255,.14),transparent 65%);animation-delay:0s;}
+.orb-2{width:160px;height:160px;bottom:-50px;right:-30px;background:radial-gradient(circle,rgba(126,255,212,.09),transparent 65%);animation-delay:-6s;}
+.orb-3{width:120px;height:120px;top:40%;left:55%;background:radial-gradient(circle,rgba(255,217,122,.06),transparent 65%);animation-delay:-12s;}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(12px,-8px) scale(1.04);}66%{transform:translate(-8px,10px) scale(.97);}}
+.wrap{position:relative;z-index:1;}
+.hdr{padding:16px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px;}
+.logo-shell{width:34px;height:34px;position:relative;flex-shrink:0;}
+.logo-ring-svg{position:absolute;inset:0;animation:spin-ring 5s linear infinite;}
+@keyframes spin-ring{to{transform:rotate(360deg);}}
+.logo-core{position:absolute;inset:4px;background:#0c0c1a;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.logo-core svg{width:13px;height:13px;}
+.hdr-text{flex:1;}
+.hdr-name{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:-.4px;line-height:1;}
+.hdr-tag{font-family:var(--mono);font-size:8px;font-weight:500;color:var(--ink-dim);margin-top:2px;letter-spacing:.3px;}
+.status-pill{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:var(--mono);font-size:8.5px;font-weight:500;color:var(--ink-dim);transition:all .4s;}
+.status-pill.online{border-color:rgba(126,255,212,.25);color:var(--green);}
+.status-pill.offline{border-color:rgba(255,122,122,.25);color:var(--red);}
+.s-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.status-pill.online .s-dot{box-shadow:0 0 6px var(--green);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.status-pill.checking .s-dot{animation:spin-dot .6s linear infinite;border:1.5px solid rgba(255,255,255,.15);border-top-color:var(--amber);background:none;box-shadow:none;width:7px;height:7px;}
+@keyframes spin-dot{to{transform:rotate(360deg);}}
+.body{padding:14px 16px;}
+.device-card{border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden;}
+.device-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,184,255,.3),transparent);}
+.dc-label{font-family:var(--mono);font-size:7.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-ghost);margin-bottom:6px;}
+.dc-id{font-family:var(--mono);font-size:9px;font-weight:500;color:var(--accent);word-break:break-all;line-height:1.6;background:rgba(200,184,255,.06);border:1px solid rgba(200,184,255,.12);border-radius:6px;padding:5px 8px;}
+.usage-wrap{margin-top:10px;}
+.usage-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;}
+.usage-label{font-family:var(--mono);font-size:7.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-ghost);}
+.usage-nums{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--ink-dim);}
+.bar-track{height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#a78bfa);transition:width 1s cubic-bezier(.4,0,.2,1);width:0%;}
+.divider{height:1px;background:var(--border);margin:10px 0;}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.spec-item{border:1px solid var(--border);border-radius:10px;padding:9px 10px;background:var(--surface);position:relative;overflow:hidden;transition:all .2s;cursor:default;}
+.spec-item:hover{background:var(--surface-hover);border-color:var(--border-bright);transform:translateY(-1px);}
+.spec-item::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;border-radius:0 2px 2px 0;}
+.spec-item.violet::after{background:var(--accent);}
+.spec-item.teal::after{background:var(--green);}
+.spec-item.gold::after{background:var(--amber);}
+.spec-item.rose::after{background:var(--red);}
+.spec-name{font-size:10px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:2px;}
+.spec-desc{font-family:var(--mono);font-size:7.5px;font-weight:500;color:var(--ink-ghost);line-height:1.4;}
+.url-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface);margin-bottom:4px;}
+.url-text{font-family:var(--mono);font-size:8px;font-weight:500;color:var(--ink-ghost);flex:1;word-break:break-all;line-height:1.4;}
+.url-btn{font-family:var(--mono);font-size:8px;font-weight:600;color:rgba(200,184,255,.5);background:none;border:none;cursor:pointer;padding:0;transition:color .15s;white-space:nowrap;}
+.url-btn:hover{color:var(--accent);}
+.ftr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;border-top:1px solid var(--border);}
+.ftr-tag{font-family:var(--mono);font-size:7.5px;font-weight:500;color:var(--ink-ghost);letter-spacing:.3px;}
+.refresh-btn{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--ink-dim);background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:5px 12px;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.refresh-btn:hover{background:var(--surface-hover);border-color:var(--border-bright);color:var(--ink);}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{width:276px;background:#0e0e1e;border:1px solid var(--border-bright);border-radius:14px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+.modal-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;}
+.modal-input{width:100%;padding:9px 11px;background:var(--surface);border:1px solid var(--border-bright);border-radius:8px;color:var(--ink);font-family:var(--mono);font-size:10px;outline:none;transition:border-color .15s;}
+.modal-input:focus{border-color:rgba(200,184,255,.5);}
+.modal-acts{display:flex;gap:7px;margin-top:12px;}
+.m-cancel{flex:1;padding:8px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--ink-dim);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;}
+.m-cancel:hover{background:var(--surface-hover);}
+.m-save{flex:2;padding:8px;border-radius:8px;background:linear-gradient(135deg,#4338ca,#7c3aed);border:none;color:#fff;font-family:var(--sans);font-size:11px;font-weight:700;cursor:pointer;transition:filter .15s;}
+.m-save:hover{filter:brightness(1.15);}
+.body>*{opacity:0;transform:translateY(6px);animation:rise .4s ease forwards;}
+.device-card{animation-delay:.05s;}
+.divider{animation-delay:.1s;}
+.spec-grid{animation-delay:.15s;}
+.url-row{animation-delay:.2s;}
+@keyframes rise{to{opacity:1;transform:none;}}
+</style>
+</head>
+<body>
+<div class="orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo-shell">
+      <svg class="logo-ring-svg" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15.5" stroke="url(#lg1)" stroke-width="1" stroke-dasharray="4 3" stroke-linecap="round"/>
+        <defs><linearGradient id="lg1" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c8b8ff"/><stop offset="50%" stop-color="#7effd4"/><stop offset="100%" stop-color="#ffd97a"/></linearGradient></defs>
+      </svg>
+      <div class="logo-core">
+        <svg viewBox="0 0 13 13" fill="none"><path d="M2 3h9M2 6.5h6.5M2 10h4" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="hdr-text">
+      <div class="hdr-name">NeuralMail</div>
+      <div class="hdr-tag">research v3 · pdf · image · audio</div>
+    </div>
+    <div class="status-pill checking" id="status-pill">
+      <div class="s-dot"></div>
+      <span id="status-text">checking</span>
+    </div>
+  </div>
+  <div class="body">
+    <div class="device-card">
+      <div class="dc-label">Device Identifier</div>
+      <div class="dc-id" id="device-id">generating...</div>
+      <div class="usage-wrap">
+        <div class="usage-top">
+          <span class="usage-label">Daily Usage</span>
+          <span class="usage-nums" id="usage-nums">— / 50</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="spec-grid">
+      <div class="spec-item violet"><div class="spec-name">Zero-Knowledge<br>Privacy</div><div class="spec-desc">client-side PII shield</div></div>
+      <div class="spec-item teal"><div class="spec-name">Voice Draft<br>&amp; Action Chips</div><div class="spec-desc">whisper mic · 1-click</div></div>
+      <div class="spec-item gold"><div class="spec-name">PDF + Image<br>+ Audio</div><div class="spec-desc">multimodal attachments</div></div>
+      <div class="spec-item rose"><div class="spec-name">Vibe Check &amp;<br>Benchmarks</div><div class="spec-desc">tone risk · readability</div></div>
+    </div>
+    <div class="url-row">
+      <span class="url-text" id="url-display">http://localhost:8082</span>
+      <button class="url-btn" id="url-edit-btn">edit</button>
+    </div>
+  </div>
+  <div class="ftr">
+    <span class="ftr-tag">groq llama-3.3-70b · gemini · whisper</span>
+    <button class="refresh-btn" id="check-btn">refresh</button>
+  </div>
+</div>
+<div class="modal-overlay" id="url-modal">
+  <div class="modal-box">
+    <div class="modal-title">Backend URL</div>
+    <input class="modal-input" id="url-input" type="text" placeholder="http://localhost:8082"/>
+    <div class="modal-acts">
+      <button class="m-cancel" id="url-cancel">Cancel</button>
+      <button class="m-save" id="url-save">Save</button>
+    </div>
+  </div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
