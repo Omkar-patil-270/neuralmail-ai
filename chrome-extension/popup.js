@@ -10,14 +10,16 @@ async function getDeviceId() {
     });
 }
 
+const PROD_BACKEND_URL = 'https://neuralmail-ai-3x2c.onrender.com';
+
 async function getUrl() {
     return new Promise(res =>
         chrome.storage.sync.get(['backendUrl'], r => {
             let url = (r && r.backendUrl ? r.backendUrl.trim() : '');
             url = url.replace(/\/+$/, '');
-            if (!url || url === 'http://localhost:8080' || url === 'http://localhost:8081' || (url.includes('localhost') && !url.includes('8082'))) {
-                url = 'http://localhost:8082';
-                chrome.storage.sync.set({ backendUrl: 'http://localhost:8082' });
+            if (!url || url.includes('localhost')) {
+                url = PROD_BACKEND_URL;
+                chrome.storage.sync.set({ backendUrl: PROD_BACKEND_URL });
             }
             res(url);
         })
@@ -35,7 +37,7 @@ async function checkHealth() {
     setStatus('checking', 'checking');
     try {
         const base = await getUrl();
-        const r = await fetch(base + '/api/email/health', { signal: AbortSignal.timeout(8000) });
+        const r = await fetch(base + '/api/email/health', { signal: AbortSignal.timeout(15000) });
         if (r.ok) setStatus('online', 'online');
         else setStatus('offline', 'error ' + r.status);
     } catch { setStatus('offline', 'offline'); }

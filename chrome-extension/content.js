@@ -1,15 +1,14 @@
-/* NeuralMail Research v3 — content.js
-   No JWT | Device ID | Intent | Dual Reply | PDF + Image + Audio */
-console.log('[NeuralMail AI v3.0] Content script active on Gmail');
+/* NeuralMail Enterprise v4 — content.js */
+console.log('[NeuralMail AI v4.0] Content script active on Gmail');
 
-var NM_BACKEND = 'http://localhost:8082';
+var NM_BACKEND = 'https://neuralmail-ai-3x2c.onrender.com';
 
 function getBackendUrl() {
     return new Promise(function(resolve) {
         chrome.storage.sync.get(['backendUrl'], function(r) {
             var url = (r && r.backendUrl ? r.backendUrl.trim() : '');
             url = url.replace(/\/+$/, '');
-            if (!url || url === 'http://localhost:8080' || url === 'http://localhost:8081' || (url.includes('localhost') && !url.includes('8082'))) {
+            if (!url || url.includes('localhost')) {
                 url = NM_BACKEND;
                 chrome.storage.sync.set({ backendUrl: NM_BACKEND });
             }
@@ -558,34 +557,23 @@ function injectStyles() {
   border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #fff;
   border-radius: 50%; animation: nmSpin 0.6s linear infinite;
 }
-.nm-fab.busy svg { opacity: 0; }
+.nm-fab.busy img { opacity: 0; }
 
-/* Global Floating Action Button on Gmail */
-.nm-global-fab {
-  position: fixed; bottom: 24px; right: 24px; width: 50px; height: 50px;
-  border-radius: 17px; z-index: 2147483640; cursor: pointer; border: none; outline: none; padding: 0;
-  overflow: hidden;
-  box-shadow: 0 12px 35px rgba(99, 102, 241, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.22);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-}
-.nm-global-fab:hover {
-  transform: scale(1.12) translateY(-3px);
-  box-shadow: 0 18px 50px rgba(124, 58, 237, 0.75), 0 0 0 1.5px rgba(255, 255, 255, 0.45);
-}
-.nm-global-fab:active { transform: scale(0.94); }
-
-/* In-thread contextual Auto-Reply pill */
-.nm-thread-reply-btn {
-  display: inline-flex; align-items: center; gap: 7px; margin: 6px 8px; padding: 8px 16px;
-  border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.25);
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
-  color: #fff; font-size: 12px; font-weight: 800; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  cursor: pointer; box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); vertical-align: middle;
-}
-.nm-thread-reply-btn:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+/* Ghostwriter Predictive Autocomplete Inline Ghost Text */
+.nm-ghost-preview {
+  color: #94a3b8 !important;
+  opacity: 0.72 !important;
+  font-style: italic !important;
+  font-size: 0.95em !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  padding: 0 5px !important;
+  margin-left: 2px !important;
+  background: rgba(99, 102, 241, 0.12) !important;
+  border-radius: 4px !important;
+  border: 1px dashed rgba(99, 102, 241, 0.3) !important;
+  display: inline !important;
+  font-family: inherit !important;
 }
 
 @keyframes nmChromaSpin { to { transform: rotate(360deg); } }
@@ -1036,7 +1024,7 @@ function injectStyles() {
   padding: 2px 6px; border-radius: 6px; background: rgba(139, 92, 246, 0.2);
   color: #ddd6fe; border: 1px solid rgba(139, 92, 246, 0.4);
 }
-.nm-suite-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 8px 10px; }
+.nm-suite-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px 10px; }
 .nm-suite-btn {
   display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px;
   border-radius: 11px; border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1111,7 +1099,10 @@ var IC = {
     subtext:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/><path d="M4.93 4.93l4.24 4.24"/></svg>',
     radar:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8z"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="12" x2="19" y2="5"/></svg>',
     deal:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
-    diplomat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>'
+    diplomat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    brief:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 12h6M9 16h4"/></svg>',
+    persona:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
 };
 
 function toast(msg, type) {
@@ -1135,6 +1126,7 @@ function buildPanel(fab) {
     var intent = detectIntent(email);
     var langHint = detectLanguageHint(email);
     var actionChips = getIntentActionChips(intent.label);
+    var logoUrl = chrome.runtime.getURL('icons/icon48.png');
     var panel  = document.createElement('div');
     panel.className = 'nm-panel';
     panel._intentMode          = 'proposed';
@@ -1149,14 +1141,39 @@ function buildPanel(fab) {
 
       // HEAD
       '<div class="nm-head">' +
-        '<div class="nm-logo"><div class="nm-logo-ring"></div><div class="nm-logo-core">'+IC.logo+'</div></div>' +
+        '<div class="nm-logo"><div class="nm-logo-ring"></div><div class="nm-logo-core" style="display:flex;align-items:center;justify-content:center;background:#0c0c1a;"><img src="'+logoUrl+'" alt="NeuralMail" style="width:20px;height:20px;object-fit:contain;border-radius:4px;pointer-events:none;" /></div></div>' +
         '<div class="nm-title-wrap">' +
           '<div class="nm-title">NeuralMail AI <span class="nm-live-dot"></span></div>' +
-          '<div class="nm-sub">RESEARCH V3.5 · MULTIMODAL PRIVACY ENGINE</div>' +
+          '<div class="nm-sub">ENTERPRISE V4.0 · AUTONOMOUS AGENT SUITE</div>' +
         '</div>' +
         '<div class="nm-badge" style="color:'+intent.color+';border-color:'+intent.color+'44;background:'+intent.color+'15;">'+intent.label+'</div>' +
         (langHint ? '<span class="nm-lang-badge" title="Click to reply in ' + langHint + '">🌐 ' + langHint + '</span>' : '') +
-        '<button class="nm-x" title="Close">✕</button>' +
+        '<button class="nm-persona-btn" id="nm-persona-btn" title="Edit Persona & Signature Profile" style="background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);color:#c7d2fe;border-radius:8px;padding:3px 7px;font-size:8.5px;font-weight:800;cursor:pointer;font-family:\'JetBrains Mono\',monospace;margin-left:auto;">👤 Persona</button>' +
+        '<button class="nm-x" title="Close" style="margin-left:6px;">✕</button>' +
+      '</div>' +
+
+      // PERSONAL PERSONA DRAWER CARD
+      '<div class="nm-intel-card" id="nm-persona-card" style="display:none;background:rgba(15,23,42,0.96);border:1px solid rgba(99,102,241,0.4);">' +
+        '<div class="nm-intel-head"><span>👤 PERSONAL PERSONA & SIGNATURE</span><button class="nm-intel-close" data-close="nm-persona-card">✕</button></div>' +
+        '<div style="padding:10px 12px;display:flex;flex-direction:column;gap:7px;">' +
+          '<div>' +
+            '<label style="font-size:7.5px;font-family:\'JetBrains Mono\',monospace;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:2px;">Your Full Name</label>' +
+            '<input class="nm-pinput" id="nm-p-name" placeholder="e.g. Omkar Patil" style="border:1px solid rgba(255,255,255,0.12);border-radius:6px;background:rgba(0,0,0,0.5);padding:5px 8px;font-size:11px;color:#fff;width:100%;box-sizing:border-box;" />' +
+          '</div>' +
+          '<div>' +
+            '<label style="font-size:7.5px;font-family:\'JetBrains Mono\',monospace;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:2px;">Role & Company</label>' +
+            '<input class="nm-pinput" id="nm-p-role" placeholder="e.g. Lead Software Architect" style="border:1px solid rgba(255,255,255,0.12);border-radius:6px;background:rgba(0,0,0,0.5);padding:5px 8px;font-size:11px;color:#fff;width:100%;box-sizing:border-box;" />' +
+          '</div>' +
+          '<div>' +
+            '<label style="font-size:7.5px;font-family:\'JetBrains Mono\',monospace;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:2px;">Calendly / Booking Link</label>' +
+            '<input class="nm-pinput" id="nm-p-link" placeholder="e.g. https://calendly.com/your-name" style="border:1px solid rgba(255,255,255,0.12);border-radius:6px;background:rgba(0,0,0,0.5);padding:5px 8px;font-size:11px;color:#fff;width:100%;box-sizing:border-box;" />' +
+          '</div>' +
+          '<div>' +
+            '<label style="font-size:7.5px;font-family:\'JetBrains Mono\',monospace;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:2px;">Custom Signature / Style Rules</label>' +
+            '<input class="nm-pinput" id="nm-p-rules" placeholder="e.g. Sign off with Warm regards, Omkar" style="border:1px solid rgba(255,255,255,0.12);border-radius:6px;background:rgba(0,0,0,0.5);padding:5px 8px;font-size:11px;color:#fff;width:100%;box-sizing:border-box;" />' +
+          '</div>' +
+          '<button class="nm-insert-btn" id="nm-save-persona-btn" style="margin:4px 0 0;padding:8px;font-size:11px;">💾 Save Persona Profile</button>' +
+        '</div>' +
       '</div>' +
 
       // INCOMING ATTACHMENTS SECTION
@@ -1223,11 +1240,11 @@ function buildPanel(fab) {
         '</div>' +
       '</div>' +
 
-      // GLOBAL INTELLIGENCE SUITE (4 STANDOUT PRO ENGINES)
+      // GLOBAL INTELLIGENCE SUITE (6 EXECUTIVE ENGINES)
       '<div class="nm-suite-section">' +
         '<div class="nm-suite-header">' +
           '<span class="nm-suite-title">⚡ Global Intelligence Suite</span>' +
-          '<span class="nm-suite-badge">4 Pro Engines</span>' +
+          '<span class="nm-suite-badge">6 Pro Engines</span>' +
         '</div>' +
         '<div class="nm-suite-grid">' +
           '<button class="nm-suite-btn" data-action="decode-subtext" title="Decodes hidden corporate meaning">' +
@@ -1249,6 +1266,16 @@ function buildPanel(fab) {
             '<div class="nm-suite-icon" style="background:rgba(168,85,247,0.18);color:#c084fc;">' + IC.diplomat + '</div>' +
             '<span class="nm-suite-lbl">Diplomat</span>' +
             '<span class="nm-suite-sub">Global Norms</span>' +
+          '</button>' +
+          '<button class="nm-suite-btn" id="nm-open-calendar-btn" title="Smart calendar RSVP & meeting counter-proposals">' +
+            '<div class="nm-suite-icon" style="background:rgba(16,185,129,0.18);color:#34d399;">' + IC.calendar + '</div>' +
+            '<span class="nm-suite-lbl">Calendar</span>' +
+            '<span class="nm-suite-sub">Smart RSVP</span>' +
+          '</button>' +
+          '<button class="nm-suite-btn" id="nm-open-brief-btn" title="Executive thread brief & action items checklist">' +
+            '<div class="nm-suite-icon" style="background:rgba(59,130,246,0.18);color:#60a5fa;">' + IC.brief + '</div>' +
+            '<span class="nm-suite-lbl">TL;DR Brief</span>' +
+            '<span class="nm-suite-sub">Action Items</span>' +
           '</button>' +
         '</div>' +
 
@@ -1283,6 +1310,25 @@ function buildPanel(fab) {
             '<button class="nm-diplo-chip" data-diplo="UK">🇬🇧 UK (Tactful)</button>' +
             '<button class="nm-diplo-chip" data-diplo="MIDDLE_EAST">🇦🇪 Middle East (Warm)</button>' +
             '<button class="nm-diplo-chip" data-diplo="INDIA">🇮🇳 India (Cordial)</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="nm-intel-card" id="nm-calendar-card">' +
+          '<div class="nm-intel-head"><span>📅 SMART CALENDAR & MEETING RSVP</span><button class="nm-intel-close" data-close="nm-calendar-card">✕</button></div>' +
+          '<div class="nm-deal-chips">' +
+            '<button class="nm-deal-chip" data-rsvp="CONFIRM_PROPOSED" style="border-color:#10b981;background:rgba(16,185,129,0.15);color:#6ee7b7;">✅ Confirm Proposed Slot</button>' +
+            '<button class="nm-deal-chip" data-rsvp="PROPOSE_ALTERNATIVES" style="border-color:#f59e0b;background:rgba(245,158,11,0.15);color:#fde68a;">🔄 Propose 2 Alternatives</button>' +
+            '<button class="nm-deal-chip" data-rsvp="DECLINE_CONFLICT" style="border-color:#f43f5e;background:rgba(244,63,94,0.15);color:#fca5a5;">⛔ Polite Schedule Conflict</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="nm-intel-card" id="nm-brief-card">' +
+          '<div class="nm-intel-scanline"></div>' +
+          '<div class="nm-intel-head"><span>📌 EXECUTIVE THREAD BRIEF & ACTIONS</span><button class="nm-intel-close" data-close="nm-brief-card">✕</button></div>' +
+          '<div class="nm-intel-body" id="nm-brief-body" style="font-size:11px;line-height:1.65;"></div>' +
+          '<div style="padding:6px 12px 10px;display:flex;gap:8px;">' +
+            '<button class="nm-copy-btn" id="nm-copy-brief-btn" style="flex:1;padding:6px;font-size:10px;">📋 Copy Brief</button>' +
+            '<button class="nm-copy-btn" id="nm-insert-brief-btn" style="flex:1;padding:6px;font-size:10px;background:rgba(16,185,129,0.25);border-color:#10b981;">📝 Insert into Draft</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -1480,6 +1526,61 @@ function buildPanel(fab) {
         };
     }
 
+    var calBtn = panel.querySelector('#nm-open-calendar-btn');
+    if (calBtn) {
+        calBtn.onclick = function() {
+            var c = panel.querySelector('#nm-calendar-card');
+            if (c) c.style.display = c.style.display === 'block' ? 'none' : 'block';
+        };
+    }
+
+    var briefBtn = panel.querySelector('#nm-open-brief-btn');
+    if (briefBtn) {
+        briefBtn.onclick = function() {
+            handleThreadBrief(panel, fab);
+        };
+    }
+
+    var personaBtn = panel.querySelector('#nm-persona-btn');
+    if (personaBtn) {
+        personaBtn.onclick = function() {
+            var c = panel.querySelector('#nm-persona-card');
+            if (!c) return;
+            var isHidden = c.style.display === 'none' || !c.style.display;
+            c.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                chrome.storage.sync.get(['nmPersonaName', 'nmPersonaRole', 'nmPersonaLink', 'nmPersonaRules'], function(d) {
+                    if (d) {
+                        if (panel.querySelector('#nm-p-name')) panel.querySelector('#nm-p-name').value = d.nmPersonaName || '';
+                        if (panel.querySelector('#nm-p-role')) panel.querySelector('#nm-p-role').value = d.nmPersonaRole || '';
+                        if (panel.querySelector('#nm-p-link')) panel.querySelector('#nm-p-link').value = d.nmPersonaLink || '';
+                        if (panel.querySelector('#nm-p-rules')) panel.querySelector('#nm-p-rules').value = d.nmPersonaRules || '';
+                    }
+                });
+            }
+        };
+    }
+
+    var savePersonaBtn = panel.querySelector('#nm-save-persona-btn');
+    if (savePersonaBtn) {
+        savePersonaBtn.onclick = function() {
+            var name  = (panel.querySelector('#nm-p-name') || {}).value || '';
+            var role  = (panel.querySelector('#nm-p-role') || {}).value || '';
+            var link  = (panel.querySelector('#nm-p-link') || {}).value || '';
+            var rules = (panel.querySelector('#nm-p-rules') || {}).value || '';
+            chrome.storage.sync.set({
+                nmPersonaName: name.trim(),
+                nmPersonaRole: role.trim(),
+                nmPersonaLink: link.trim(),
+                nmPersonaRules: rules.trim()
+            }, function() {
+                toast('Persona profile saved!', 'ok');
+                var c = panel.querySelector('#nm-persona-card');
+                if (c) c.style.display = 'none';
+            });
+        };
+    }
+
     panel.querySelectorAll('.nm-deal-chip').forEach(function(chip) {
         chip.onclick = function() {
             handleTacticalNegotiate(chip.getAttribute('data-deal'), panel, fab);
@@ -1491,6 +1592,38 @@ function buildPanel(fab) {
             handleCulturalDiplomat(chip.getAttribute('data-diplo'), panel, fab);
         };
     });
+
+    panel.querySelectorAll('[data-rsvp]').forEach(function(chip) {
+        chip.onclick = function() {
+            handleCalendarRsvp(chip.getAttribute('data-rsvp'), panel, fab);
+        };
+    });
+
+    var copyBriefBtn = panel.querySelector('#nm-copy-brief-btn');
+    if (copyBriefBtn) {
+        copyBriefBtn.onclick = function() {
+            var body = panel.querySelector('#nm-brief-body');
+            var txt = (body && body.innerText) || '';
+            if (txt) {
+                navigator.clipboard.writeText(txt);
+                toast('Brief copied to clipboard!', 'ok');
+            }
+        };
+    }
+
+    var insertBriefBtn = panel.querySelector('#nm-insert-brief-btn');
+    if (insertBriefBtn) {
+        insertBriefBtn.onclick = function() {
+            var body = panel.querySelector('#nm-brief-body');
+            var txt = (body && body.innerText) || '';
+            if (txt) {
+                openReplyComposeIfClosed().then(function() {
+                    insertCompose(txt);
+                    toast('Brief inserted into draft!', 'ok');
+                });
+            }
+        };
+    }
 
     // Smart quick action chips (1-click reply generation)
     panel.querySelectorAll('.nm-smart-chip').forEach(function(chip){
@@ -1784,6 +1917,12 @@ function handleAction(action, panel, fab) {
     (async function(){
         var t = null;
         try {
+            var persona = await getPersonaContext();
+            var effectiveCustom = custom;
+            if (persona) {
+                effectiveCustom = (effectiveCustom ? (effectiveCustom + '\n') : '') + persona;
+            }
+
             if (action === 'reply' || action === 'auto-reply' || action === 'followup') {
                 var ec = getEmailContent();
                 var incoming = panel._incomingAttachments || [];
@@ -1819,7 +1958,7 @@ function handleAction(action, panel, fab) {
                     threadContext: piiThread.text,
                     tone: tone,
                     replyLength: len,
-                    customPrompt: custom,
+                    customPrompt: effectiveCustom,
                     intentMode: intentMode,
                     mediaContent: mediaPayload ? mediaPayload.mediaContent : null,
                     mediaType: mediaPayload ? mediaPayload.mediaType : null
@@ -2083,6 +2222,191 @@ function renderVariations(panel, vars) {
     });
 }
 
+function getPersonaContext() {
+    return new Promise(function(resolve) {
+        chrome.storage.sync.get(['nmPersonaName', 'nmPersonaRole', 'nmPersonaLink', 'nmPersonaRules'], function(d) {
+            var parts = [];
+            if (d && d.nmPersonaName) parts.push('My Name: ' + d.nmPersonaName);
+            if (d && d.nmPersonaRole) parts.push('My Role/Company: ' + d.nmPersonaRole);
+            if (d && d.nmPersonaLink) parts.push('My Calendar Booking Link: ' + d.nmPersonaLink);
+            if (d && d.nmPersonaRules) parts.push('My Persona/Signature Guidelines: ' + d.nmPersonaRules);
+            resolve(parts.join('\n'));
+        });
+    });
+}
+
+async function handleCalendarRsvp(rsvpType, panel, fab) {
+    if (fab) fab.classList.add('busy');
+    var ec = getEmailContent();
+    if (!ec) { toast('Open an email first to schedule RSVP', 'err'); if (fab) fab.classList.remove('busy'); return; }
+    var piiEc = maskPII(ec);
+    var persona = await getPersonaContext();
+    var t = toast('Drafting calendar RSVP...', 'load');
+    try {
+        var res = await callBg({
+            type: 'CALENDAR_RSVP',
+            emailContent: piiEc.text,
+            intentMode: rsvpType,
+            customPrompt: persona
+        });
+        t.remove();
+        var reply = unmaskPII(res.result, piiEc.map);
+        panel._lastReply = reply;
+        var replyWrap = panel.querySelector('#nm-reply-wrap');
+        if (replyWrap) {
+            var rBody = replyWrap.querySelector('#nm-reply-body');
+            if (rBody) rBody.innerText = reply;
+            replyWrap.style.display = 'block';
+            replyWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        await openReplyComposeIfClosed();
+        insertCompose(reply);
+        toast('Meeting RSVP inserted into compose!', 'ok');
+    } catch(err) {
+        if (t) t.remove();
+        toast('Calendar RSVP failed: ' + err.message, 'err');
+    } finally {
+        if (fab) fab.classList.remove('busy');
+    }
+}
+
+async function handleThreadBrief(panel, fab) {
+    if (fab) fab.classList.add('busy');
+    var ec = getEmailContent();
+    var thread = getThreadContext();
+    var contentToBrief = thread ? (thread + '\n\n' + (ec || '')) : (ec || '');
+    if (!contentToBrief || contentToBrief.length < 10) {
+        toast('Open an email thread first to extract brief', 'err');
+        if (fab) fab.classList.remove('busy');
+        return;
+    }
+    var piiEc = maskPII(contentToBrief);
+    var t = toast('Condensing thread into executive brief...', 'load');
+    try {
+        var res = await callBg({
+            type: 'THREAD_BRIEF',
+            emailContent: piiEc.text
+        });
+        t.remove();
+        var brief = unmaskPII(res.result, piiEc.map);
+        var card = panel.querySelector('#nm-brief-card');
+        var body = panel.querySelector('#nm-brief-body');
+        if (card && body) {
+            var formatted = brief.replace(/^- \[( |x)\] (.*)$/gim, function(m, chk, text) {
+                var isChecked = chk.toLowerCase() === 'x';
+                return '<label style="display:flex;align-items:flex-start;gap:6px;margin:3px 0;cursor:pointer;"><input type="checkbox" ' + (isChecked ? 'checked' : '') + ' style="margin-top:2px;" /><span>' + text + '</span></label>';
+            });
+            body.innerHTML = formatted.replace(/\n/g, '<br>');
+            card.style.display = 'block';
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        toast('Executive thread brief ready!', 'ok');
+    } catch(err) {
+        if (t) t.remove();
+        toast('Brief failed: ' + err.message, 'err');
+    } finally {
+        if (fab) fab.classList.remove('busy');
+    }
+}
+
+// ── 👻 GHOSTWRITER PREDICTIVE INLINE AUTOCOMPLETE ────────────
+var ghostTimer = null;
+var ghostActiveSpan = null;
+
+function removeGhostText(box) {
+    if (ghostActiveSpan && ghostActiveSpan.parentNode) {
+        ghostActiveSpan.remove();
+    }
+    if (box) {
+        var spans = box.querySelectorAll('.nm-ghost-preview');
+        spans.forEach(function(s) { s.remove(); });
+    }
+    ghostActiveSpan = null;
+}
+
+function attachGhostwriter() {
+    var boxes = document.querySelectorAll('div[role="textbox"][contenteditable="true"], div.Am.Al.editable');
+    boxes.forEach(function(box) {
+        if (box.dataset.nmGhostAttached) return;
+        box.dataset.nmGhostAttached = 'true';
+
+        box.addEventListener('keydown', function(e) {
+            var ghost = box.querySelector('.nm-ghost-preview');
+            if (ghost && (e.key === 'Tab' || e.key === 'ArrowRight')) {
+                e.preventDefault();
+                e.stopPropagation();
+                var raw = ghost.getAttribute('data-raw') || '';
+                removeGhostText(box);
+                if (raw) {
+                    document.execCommand('insertText', false, raw);
+                }
+                return;
+            }
+            if (ghost && e.key === 'Escape') {
+                e.preventDefault();
+                removeGhostText(box);
+                return;
+            }
+            if (ghost && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt') {
+                removeGhostText(box);
+            }
+        }, true);
+
+        box.addEventListener('input', function(e) {
+            removeGhostText(box);
+            if (ghostTimer) clearTimeout(ghostTimer);
+
+            ghostTimer = setTimeout(function() {
+                var sel = window.getSelection();
+                if (!sel || !sel.rangeCount) return;
+                var range = sel.getRangeAt(0);
+                if (!box.contains(range.startContainer)) return;
+
+                var preRange = range.cloneRange();
+                preRange.selectNodeContents(box);
+                preRange.setEnd(range.startContainer, range.startOffset);
+                var text = preRange.toString();
+                var lines = text.split('\n');
+                var currentLine = (lines[lines.length - 1] || '').trim();
+
+                if (currentLine.length < 8 || /[.?!]$/.test(currentLine)) return;
+
+                var ec = getEmailContent() || '';
+                chrome.runtime.sendMessage({
+                    type: 'AUTOCOMPLETE',
+                    customPrompt: currentLine,
+                    emailContent: ec.slice(0, 500)
+                }, function(resp) {
+                    if (chrome.runtime.lastError || !resp || !resp.success || !resp.result) return;
+                    var suggestion = resp.result.trim();
+                    if (!suggestion) return;
+                    if (!suggestion.startsWith(' ') && !currentLine.endsWith(' ')) {
+                        suggestion = ' ' + suggestion;
+                    }
+
+                    var curSel = window.getSelection();
+                    if (!curSel || !curSel.rangeCount) return;
+                    var curRange = curSel.getRangeAt(0);
+                    if (!box.contains(curRange.startContainer)) return;
+
+                    removeGhostText(box);
+                    var span = document.createElement('span');
+                    span.className = 'nm-ghost-preview';
+                    span.contentEditable = 'false';
+                    span.setAttribute('data-raw', suggestion);
+                    span.innerText = suggestion + '  ⇥';
+
+                    try {
+                        curRange.insertNode(span);
+                        curSel.collapse(span, 0);
+                    } catch(ex) {}
+                    ghostActiveSpan = span;
+                });
+            }, 450);
+        });
+    });
+}
+
 function injectFAB(toolbar) {
     if (!toolbar || toolbar.querySelector('.nm-fab')) return;
     var sendBtn =
@@ -2093,12 +2417,11 @@ function injectFAB(toolbar) {
     injectStyles();
     var wrap = document.createElement('div'); wrap.className = 'nm-wrap';
     var fab  = document.createElement('button'); fab.className = 'nm-fab'; fab.title = 'NeuralMail AI';
+    var logoUrl = chrome.runtime.getURL('icons/icon48.png');
     fab.innerHTML =
         '<div class="nm-fab-bg"></div>' +
-        '<div class="nm-fab-inner">' +
-            '<svg width="15" height="15" viewBox="0 0 14 14" fill="none">' +
-                '<path d="M2 3.5h10M2 7h7M2 10.5h4.5" stroke="white" stroke-width="1.9" stroke-linecap="round"/>' +
-            '</svg>' +
+        '<div class="nm-fab-inner" style="display:flex;align-items:center;justify-content:center;">' +
+            '<img src="' + logoUrl + '" alt="NeuralMail" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px; pointer-events: none;" />' +
         '</div>';
     var active = null;
     fab.onclick = function(e){
@@ -2125,93 +2448,20 @@ function injectFAB(toolbar) {
     else ins.parentNode.appendChild(wrap);
 }
 
-var activeGlobalPanel = null;
-
-function injectGlobalFAB() {
-    if (document.getElementById('nm-global-fab-btn')) return;
-    injectStyles();
-    var fab = document.createElement('button');
-    fab.id = 'nm-global-fab-btn';
-    fab.className = 'nm-global-fab';
-    fab.title = 'NeuralMail AI — Click to Open Assistant';
-    fab.innerHTML =
-        '<div class="nm-fab-bg"></div>' +
-        '<div class="nm-fab-inner">' +
-            '<svg width="18" height="18" viewBox="0 0 14 14" fill="none">' +
-                '<path d="M2 3.5h10M2 7h7M2 10.5h4.5" stroke="white" stroke-width="1.9" stroke-linecap="round"/>' +
-            '</svg>' +
-        '</div>';
-
-    fab.onclick = function(e) {
-        e.stopPropagation();
-        if (activeGlobalPanel) {
-            closePanel(activeGlobalPanel, fab);
-            activeGlobalPanel = null;
-            return;
-        }
-        fab.classList.add('open');
-        var panel = buildPanel(fab);
-        positionPanel(panel, fab);
-        activeGlobalPanel = panel;
-        setTimeout(function() {
-            function out(ev) {
-                if (!panel.contains(ev.target) && ev.target !== fab) {
-                    closePanel(panel, fab);
-                    activeGlobalPanel = null;
-                    document.removeEventListener('click', out, true);
-                }
-            }
-            document.addEventListener('click', out, true);
-        }, 180);
-    };
-    document.body.appendChild(fab);
-}
-
-function injectThreadReplyBtn() {
-    var replySelectors = [
-        '.ams.bkH',
-        'span[role="button"][data-tooltip*="Reply" i]',
-        'div[role="button"][data-tooltip*="Reply" i]',
-        '.m9 .T-I-ax7'
-    ];
-    for (var i = 0; i < replySelectors.length; i++) {
-        var targets = document.querySelectorAll(replySelectors[i]);
-        targets.forEach(function(rb) {
-            if (!rb || !rb.offsetParent || (rb.parentNode && rb.parentNode.querySelector('.nm-thread-reply-btn'))) return;
-            var btn = document.createElement('button');
-            btn.className = 'nm-thread-reply-btn';
-            btn.innerHTML = '<span>⚡</span> NeuralMail Auto-Reply';
-            btn.onclick = function(e) {
-                e.stopPropagation();
-                openReplyComposeIfClosed().then(function() {
-                    var fab = document.querySelector('.nm-fab') || document.getElementById('nm-global-fab-btn');
-                    var panel = document.querySelector('.nm-panel');
-                    if (!panel && fab) {
-                        fab.click();
-                    }
-                    setTimeout(function() {
-                        var p = document.querySelector('.nm-panel');
-                        var f = document.querySelector('.nm-fab') || document.getElementById('nm-global-fab-btn');
-                        if (p && f) {
-                            toast('Generating smart reply...', 'load');
-                            handleAction('auto-reply', p, f);
-                        }
-                    }, 120);
-                });
-            };
-            if (rb.nextSibling) rb.parentNode.insertBefore(btn, rb.nextSibling);
-            else if (rb.parentNode) rb.parentNode.appendChild(btn);
-        });
-    }
-}
-
 function scan(){
-    injectGlobalFAB();
-    injectThreadReplyBtn();
+    // Delete any old floating FAB or thread buttons that were cluttering the UI
+    var oldGlobalFab = document.getElementById('nm-global-fab-btn');
+    if (oldGlobalFab) oldGlobalFab.remove();
+    document.querySelectorAll('.nm-thread-reply-btn').forEach(function(b) { b.remove(); });
+
+    // Inject ONLY into compose toolbars
     document.querySelectorAll('.gU.Up').forEach(injectFAB);
     document.querySelectorAll('[role="dialog"]').forEach(function(d){
         var t = d.querySelector('.gU.Up'); if(t) injectFAB(t);
     });
+
+    // Attach ghostwriter inline autocomplete
+    attachGhostwriter();
 }
 new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
 setTimeout(scan, 500); setTimeout(scan, 1500); setTimeout(scan, 3500);

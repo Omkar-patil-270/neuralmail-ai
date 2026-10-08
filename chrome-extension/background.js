@@ -1,5 +1,5 @@
-/* NeuralMail AI v3 - background.js */
-const BACKEND_URL = 'http://localhost:8082';
+/* NeuralMail AI v4 - background.js */
+const BACKEND_URL = 'https://neuralmail-ai-3x2c.onrender.com';
 
 async function getDeviceId() {
     return new Promise(res => {
@@ -16,8 +16,8 @@ async function getUrl() {
         chrome.storage.sync.get(['backendUrl'], r => {
             let url = (r && r.backendUrl ? r.backendUrl.trim() : '');
             url = url.replace(/\/+$/, '');
-            // Automatically migrate any legacy localhost setting (8080, 8081, etc.) to 8082
-            if (!url || url === 'http://localhost:8080' || url === 'http://localhost:8081' || (url.includes('localhost') && !url.includes('8082'))) {
+            // Automatically migrate any legacy localhost setting to production Render URL
+            if (!url || url.includes('localhost')) {
                 url = BACKEND_URL;
                 chrome.storage.sync.set({ backendUrl: BACKEND_URL });
             }
@@ -173,6 +173,27 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
             } else if (type === 'CULTURAL_DIPLOMAT') {
                 const data = await post('cultural-diplomat', { emailContent, tone: tone || 'JAPAN' });
+                out.result = data.result;
+
+            } else if (type === 'AUTOCOMPLETE') {
+                const data = await post('autocomplete', {
+                    customPrompt: customPrompt || '',
+                    emailContent: emailContent || ''
+                });
+                out.result = data.result;
+
+            } else if (type === 'CALENDAR_RSVP') {
+                const data = await post('calendar-rsvp', {
+                    emailContent,
+                    intentMode: intentMode || 'CONFIRM_PROPOSED',
+                    customPrompt: customPrompt || ''
+                });
+                out.result = data.result;
+
+            } else if (type === 'THREAD_BRIEF') {
+                const data = await post('thread-brief', {
+                    emailContent: emailContent || ''
+                });
                 out.result = data.result;
 
             } else {

@@ -34,11 +34,15 @@ public class EmailGeneratorService {
     }
 
     public String callGroq(String systemPrompt, String userPrompt) {
+        return callGroq(systemPrompt, userPrompt, 1024, 0.75);
+    }
+
+    public String callGroq(String systemPrompt, String userPrompt, int maxTokens, double temperature) {
         try {
             ObjectNode body = objectMapper.createObjectNode();
             body.put("model", model);
-            body.put("temperature", 0.75);
-            body.put("max_tokens", 1024);
+            body.put("temperature", temperature);
+            body.put("max_tokens", maxTokens);
             ArrayNode messages = objectMapper.createArrayNode();
             ObjectNode sys = objectMapper.createObjectNode();
             sys.put("role", "system"); sys.put("content", systemPrompt);
@@ -226,5 +230,73 @@ public class EmailGeneratorService {
                 """ + req.getEmailContent();
 
         return callGroq("You are a world-class international diplomat and cross-cultural business communications expert.", prompt);
+    }
+
+    // ── 👻 GHOSTWRITER INLINE AUTOCOMPLETE (Fast Sub-200ms) ───
+    public String autocompleteEmail(EmailRequest req) {
+        String currentLine = req.getCustomPrompt() != null ? req.getCustomPrompt() : "";
+        String context = (req.getEmailContent() != null && !req.getEmailContent().isBlank())
+                ? "\nEmail context / received email:\n" + req.getEmailContent().substring(0, Math.min(req.getEmailContent().length(), 600))
+                : "";
+
+        String prompt = "Predict the next 4 to 12 words of the sentence the user is actively typing in their email draft."
+                + context
+                + "\n\nUser is typing: \"" + currentLine + "\""
+                + "\n\nRules: Output ONLY the continuation text that completes the thought naturally. Do NOT repeat what the user typed. No quotes. No preamble.";
+
+        String continuation = callGroq(
+                "You are an ultra-fast email autocomplete engine. Output ONLY the natural sentence continuation text. No quotes. No preamble.",
+                prompt,
+                35,
+                0.2
+        );
+
+        // Sanitize any extra quotes or accidental repeats
+        continuation = continuation.replaceAll("^[\"']+|[\"']+$", "").trim();
+        return continuation;
+    }
+
+    // ── 📅 SMART CALENDAR RSVP & SCHEDULER ───────────────────
+    public String generateCalendarRsvp(EmailRequest req, String rsvpType) {
+        String type = rsvpType != null ? rsvpType : "CONFIRM_PROPOSED";
+        String customRules = (req.getCustomPrompt() != null && !req.getCustomPrompt().isBlank())
+                ? "\nUser Profile / Signature Rules: " + req.getCustomPrompt() : "";
+
+        String prompt = """
+                Incoming Email proposing a meeting or call:
+                """ + req.getEmailContent() + """
+
+                Requested Action: """ + type + customRules + """
+
+                Rules for the reply:
+                - If CONFIRM_PROPOSED: Confirm the proposed date and time with enthusiasm. Note that you have added it to your calendar and will send/await the invite.
+                - If PROPOSE_ALTERNATIVES: Acknowledge the request, politely state a minor conflict with the proposed slot, and suggest 2 realistic alternative windows (e.g. tomorrow afternoon or Friday morning).
+                - If DECLINE_CONFLICT: Express sincere appreciation, decline politely due to current schedule commitments, and suggest touching base later.
+                - Output ONLY the ready-to-send email body. No subject line. No preamble.
+                """;
+
+        return callGroq("You are an executive scheduling assistant. You craft crisp, professional meeting RSVPs.", prompt);
+    }
+
+    // ── 📌 EXECUTIVE THREAD BRIEF & ACTION CHECKLIST ──────────
+    public String extractThreadBrief(EmailRequest req) {
+        String prompt = """
+                Analyze this email thread and provide an executive-level briefing with clear action items:
+
+                """ + req.getEmailContent() + """
+
+                Format your response strictly as:
+                📌 EXECUTIVE TL;DR:
+                [1 punchy sentence summarizing the consensus or current status]
+
+                ✅ ACTION ITEMS FOR YOU:
+                - [Specific action required from you or your team]
+                - [Next step or deliverable]
+
+                ⚠️ DATES & DEADLINES:
+                [Any critical dates, meetings, or deadlines mentioned, or 'None specified']
+                """;
+
+        return callGroq("You are an executive chief-of-staff. You condense email threads into high-priority actionable executive briefings.", prompt);
     }
 }

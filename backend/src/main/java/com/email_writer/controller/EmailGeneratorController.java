@@ -189,6 +189,41 @@ public class EmailGeneratorController {
         }
     }
 
+    @PostMapping("/autocomplete")
+    public ResponseEntity<EmailResponse> autocomplete(@RequestBody EmailRequest req) {
+        try {
+            rateLimitService.checkRateLimit(req.getDeviceId());
+            return ResponseEntity.ok(EmailResponse.ok(emailService.autocompleteEmail(req)));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(EmailResponse.fail(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/calendar-rsvp")
+    public ResponseEntity<EmailResponse> calendarRsvp(@RequestBody EmailRequest req) {
+        try {
+            if (blank(req.getEmailContent()))
+                return ResponseEntity.badRequest().body(EmailResponse.fail("emailContent is required"));
+            rateLimitService.checkRateLimit(req.getDeviceId());
+            String rsvpType = req.getIntentMode() != null ? req.getIntentMode() : "CONFIRM_PROPOSED";
+            return ResponseEntity.ok(EmailResponse.ok(emailService.generateCalendarRsvp(req, rsvpType)));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(EmailResponse.fail(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/thread-brief")
+    public ResponseEntity<EmailResponse> threadBrief(@RequestBody EmailRequest req) {
+        try {
+            if (blank(req.getEmailContent()))
+                return ResponseEntity.badRequest().body(EmailResponse.fail("emailContent is required"));
+            rateLimitService.checkRateLimit(req.getDeviceId());
+            return ResponseEntity.ok(EmailResponse.ok(emailService.extractThreadBrief(req)));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(EmailResponse.fail(e.getMessage()));
+        }
+    }
+
     @GetMapping("/research/benchmarks")
     public ResponseEntity<java.util.Map<String, Object>> getResearchBenchmarks() {
         var records = emailService.getAllComparisons();
